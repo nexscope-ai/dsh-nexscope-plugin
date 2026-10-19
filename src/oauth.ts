@@ -273,7 +273,7 @@ export class NexscopeOAuth {
   async hasAccessToken(): Promise<boolean> {
     const grant = await this.loadGrant()
     const token = grant.tokens
-    if (!isTokenRecord(token) || token.access_token === '') return false
+    if (!isTokenRecord(token) || !isNonEmptyString(token.access_token)) return false
     const expiresAt = tokenExpiry(grant)
     return expiresAt === undefined || expiresAt - EXPIRY_SKEW_MS > Date.now()
   }
@@ -287,13 +287,15 @@ export class NexscopeOAuth {
     const grant = await this.loadGrant()
     const token = grant.tokens
     if (!isTokenRecord(token)) return false
-    return token.access_token !== '' || token.refresh_token !== undefined
+    return isNonEmptyString(token.access_token) || isNonEmptyString(token.refresh_token)
   }
 
   /** Read the stored access token, if any. */
   async accessToken(): Promise<string | undefined> {
     const grant = await this.loadGrant()
-    return isTokenRecord(grant.tokens) ? grant.tokens.access_token : undefined
+    return isTokenRecord(grant.tokens) && isNonEmptyString(grant.tokens.access_token)
+      ? grant.tokens.access_token
+      : undefined
   }
 
   /** Forget every stored OAuth artifact. */
@@ -458,6 +460,11 @@ export class NexscopeOAuth {
     this.loaded = true
     await this.credentials.modifyRecord(this.key, async () => ({ kind: 'grant', payload: next }))
   }
+}
+
+/** Whether a value is a usable non-empty string. */
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value !== ''
 }
 
 /** Narrow a stored token record; a corrupted credential must not throw. */

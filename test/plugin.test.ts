@@ -324,6 +324,17 @@ describe('NexscopeOAuth', () => {
     expect(await oauth.hasGrant()).toBe(true)
   })
 
+  it('rejects a malformed token record without throwing', async () => {
+    const credentials = memoryCredentials()
+    const oauth = new NexscopeOAuth(fakeContext(credentials) as never, resolveConfig())
+    await oauth.patchGrant({ tokens: {} as never })
+    expect(await oauth.hasGrant()).toBe(false)
+    expect(await oauth.hasAccessToken()).toBe(false)
+    expect(await oauth.accessToken()).toBeUndefined()
+    await oauth.patchGrant({ tokens: { access_token: 42 } as never })
+    expect(await oauth.hasGrant()).toBe(false)
+  })
+
   it('reports no grant when the store is empty', async () => {
     const oauth = new NexscopeOAuth(fakeContext() as never, resolveConfig())
     expect(await oauth.hasGrant()).toBe(false)
