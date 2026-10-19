@@ -1,0 +1,66 @@
+{
+  "format": 1,
+  "title": {
+    "en": "Nexscope",
+    "zh": "Nexscope"
+  },
+  "description": {
+    "en": "Ecommerce research plugins for DeepSeek Harness.",
+    "zh": "面向 DeepSeek Harness 的电商研究插件。"
+  },
+  "metadata": {
+    "categories": {
+      "data": {
+        "title": {
+          "en": "Data",
+          "zh": "数据"
+        }
+      }
+    },
+    "labels": {
+      "ecommerce": {
+        "title": {
+          "en": "Ecommerce",
+          "zh": "电商"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-nexscope",
+      "title": {
+        "en": "Nexscope",
+        "zh": "Nexscope"
+      },
+      "description": {
+        "en": "Research ecommerce products, keywords, markets, competitors, reviews, and advertising with Nexscope. Sign in with OAuth and use the full published capability catalog.",
+        "zh": "使用 Nexscope 研究电商商品、关键词、市场、竞品、评论与广告。通过 OAuth 登录并使用完整的已发布能力目录。"
+      },
+      "icon": "icons/nexscope.png",
+      "author": "Nexscope",
+      "homepage": "https://www.nexscope.ai",
+      "repository": {
+        "url": "https://github.com/nexscope-ai/dsh-nexscope-plugin"
+      },
+      "metadata": {
+        "category": "data",
+        "labels": [
+          "ecommerce"
+        ]
+      },
+      "versions": [
+        {
+          "version": "0.1.0",
+          "publishTimestamp": 1792404130,
+          "source": {
+            "type": "npm"
+          },
+          "engines": {
+            "dsh": ">=0.2.0-rc.2 <0.3.0"
+          }
+        }
+      ]
+    }
+  ]
+}

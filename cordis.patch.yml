@@ -1,0 +1,5 @@
+# dsh-nexscope: mounts the Nexscope plugin into a DSH profile.
+# Install with `dsh plugin --profile <name> add dsh-nexscope`.
+- insert:
+    - id: nexscope
+      name: dsh-nexscope
