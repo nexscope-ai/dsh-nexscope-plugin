@@ -59,9 +59,23 @@ const skillProvider = {
       provider: 'nexscope',
       source: 'bundled',
       resourceBase: SKILL_RESOURCE_BASE,
-      content: await readFile(SKILL_URL, 'utf8'),
+      content: stripFrontmatter(await readFile(SKILL_URL, 'utf8')),
     }
   },
+}
+
+/**
+ * Remove a leading YAML frontmatter block. The skill loader already exposes
+ * `name` and `description` through the candidate, so the model should receive
+ * the instruction body only.
+ * @param raw - the skill file contents.
+ * @returns the body without frontmatter.
+ */
+export function stripFrontmatter(raw: string): string {
+  if (!raw.startsWith('---\n') && !raw.startsWith('---\r\n')) return raw
+  const match = /^---\r?\n[\s\S]*?\r?\n---\r?\n?/u.exec(raw)
+  if (match === null) return raw
+  return raw.slice(match[0].length).replace(/^\r?\n/u, '')
 }
 
 /**

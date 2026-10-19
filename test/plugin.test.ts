@@ -11,6 +11,7 @@ import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { CallToolResult, Tool } from '@modelcontextprotocol/client'
 import { NexscopeTools, renderContent, scoreTool } from '../src/tools.js'
+import { stripFrontmatter } from '../src/index.js'
 import {
   assertInsideWorkspace,
   exportDeliverable,
@@ -104,6 +105,22 @@ function oauthStub() {
 
 afterEach(() => {
   vi.restoreAllMocks()
+})
+
+describe('stripFrontmatter', () => {
+  it('removes a leading YAML block and keeps the body', () => {
+    const raw = '---\nname: nexscope\ndescription: test\n---\n# Nexscope\n\nBody.\n'
+    expect(stripFrontmatter(raw)).toBe('# Nexscope\n\nBody.\n')
+  })
+
+  it('drops the blank line after the closing fence', () => {
+    const raw = '---\nname: nexscope\n---\n\n# Nexscope\n'
+    expect(stripFrontmatter(raw)).toBe('# Nexscope\n')
+  })
+
+  it('leaves content without frontmatter untouched', () => {
+    expect(stripFrontmatter('# Nexscope\n')).toBe('# Nexscope\n')
+  })
 })
 
 describe('renderContent', () => {

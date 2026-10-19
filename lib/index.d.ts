@@ -6,6 +6,14 @@ export declare const name = "nexscope";
 export declare const inject: string[];
 export { Config };
 /**
+ * Remove a leading YAML frontmatter block. The skill loader already exposes
+ * `name` and `description` through the candidate, so the model should receive
+ * the instruction body only.
+ * @param raw - the skill file contents.
+ * @returns the body without frontmatter.
+ */
+export declare function stripFrontmatter(raw: string): string;
+/**
  * Mount the plugin.
  * @param ctx - the plugin context.
  * @param config - validated plugin configuration.

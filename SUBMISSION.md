@@ -5,7 +5,7 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 ## Verified
 
 - [x] `npm run typecheck` passes.
-- [x] `npm test` passes: 43 tests across four files.
+- [x] `npm test` passes: 46 tests across four files.
 - [x] GitHub Actions `CI` passes on a clean Linux runner (`npm ci`, typecheck, tests, `npm pack --dry-run`).
 - [x] `npm run build` emits `lib/`; `npm pack --dry-run` produces 18 files, 66.7 kB.
 - [x] A real MCP client/server integration test over a linked in-memory transport covers tool discovery, exact schema pass-through, multi-block text plus structured content, and upstream error results.
@@ -13,6 +13,7 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 - [x] `dsh --profile web --dump-config` shows the `nexscope` row.
 - [x] `dsh --profile web --dump-config-schema` resolves the entry as `status: schema` and adds **no** new diagnostics compared with a plugin-free baseline.
 - [x] The installed package resolves from the profile's `node_modules` and exports `name`, `inject`, `Config`, `apply`.
+- [x] The bundled skill body is delivered without its YAML frontmatter; the catalog already carries the name and description.
 - [x] A real-Cordis integration test mounts the plugin beside the real `dsh-tools`, `dsh-skill`, `dsh-credentials-local`, and `dsh-skill-filesystem` services, then asserts the `nexscope` skill and all eight tools are registered.
 - [x] The authorization server advertises `client_id_metadata_document_supported`; the authorize endpoint accepts a CIMD client and a loopback redirect URI and returns the login redirect.
 - [x] The token endpoint accepts the CIMD client identity for `authorization_code` and returns `invalid_grant` for a fake code, proving client authentication and PKCE parameters are accepted.
