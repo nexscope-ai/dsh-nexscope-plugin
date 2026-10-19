@@ -5,7 +5,7 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 ## Verified
 
 - [x] `npm run typecheck` passes.
-- [x] `npm test` passes: 40 tests across three files.
+- [x] `npm test` passes: 43 tests across four files.
 - [x] GitHub Actions `CI` passes on a clean Linux runner (`npm ci`, typecheck, tests, `npm pack --dry-run`).
 - [x] `npm run build` emits `lib/`; `npm pack --dry-run` produces 18 files, 66.7 kB.
 - [x] A real MCP client/server integration test over a linked in-memory transport covers tool discovery, exact schema pass-through, multi-block text plus structured content, and upstream error results.
@@ -19,7 +19,8 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 - [x] The token endpoint requires the RFC 8707 `resource` parameter on refresh (`invalid_target` when absent, `invalid_grant` when present); the MCP SDK sends `resource` on both the code exchange and the refresh path.
 - [x] The OAuth callback listener accepts a valid code, rejects a state mismatch, rejects a denial, and times out.
 - [x] Sign-in preflights the client-metadata document (reachability, JSON content type, matching `client_id`, and the exact loopback callback). The temporary document passes; with the production document absent, sign-in fails in about 2 seconds with `HTTP 404` and the URL to fix, instead of opening a browser and timing out.
-- [x] The market index validates with `parseMarketIndex` from `@deepseek-ai/dsh-plugin-market-index`.
+- [x] The market index validates with `parseMarketIndex` from `@deepseek-ai/dsh-plugin-market-index`, and an asset test keeps the index version, `engines.dsh`, icon URL, icon size, and the client metadata document in sync with the package.
+- [x] `npm audit --omit=dev` reports no vulnerabilities.
 - [x] **Live OAuth sign-in against production.** The browser flow completed with the CIMD client, the loopback callback received the code, and the token exchange stored a grant with a refresh token (`expires_in: 899`, `scope: mcp:tools`).
 - [x] **Live catalog read.** The plugin connected to `https://api.nexscope.ai/api/skill-api/v2/mcp` and listed **545** published tools.
 - [x] **Live paid call through the model-facing tool.** `nexscope_call_tool` ran `nexscope_1688_product_detail` with `offerId: 1040473674152`, returned `code: 0` with product and SKU data in about 2.2 s. The response reported `cost: -1`, while the account usage page recorded `research:/alibaba1688/productDetail:EN` at `-10` credits for that minute, so the real charge was 10 credits.
