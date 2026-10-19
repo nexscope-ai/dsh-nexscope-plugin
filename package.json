@@ -1,7 +1,7 @@
 {
   "name": "dsh-nexscope",
   "version": "0.1.0",
-  "description": "Nexscope ecommerce research for DeepSeek Harness: OAuth sign-in, all published skills, workflows, exports, and account tools.",
+  "description": "Nexscope ecommerce research for DeepSeek Harness: OAuth sign-in, the full published capability catalog, exports, and account queries.",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -31,19 +31,16 @@
     "node": ">=22.19.0"
   },
   "keywords": [
-    "dsh",
     "dsh-plugin",
     "deepseek-harness",
     "nexscope",
     "ecommerce",
     "amazon",
-    "mcp"
+    "tiktok",
+    "mcp",
+    "oauth"
   ],
-  "author": {
-    "name": "Nexscope",
-    "email": "service@nexscope.ai",
-    "url": "https://www.nexscope.ai"
-  },
+  "author": "Nexscope",
   "homepage": "https://www.nexscope.ai",
   "repository": {
     "type": "git",
@@ -58,7 +55,8 @@
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepack": "npm run build",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "verify": "npm run typecheck && npm test && npm run build"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "~4.0.5",
@@ -85,5 +83,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/client": "^2.3.1"
+  },
+  "bugs": {
+    "url": "https://github.com/nexscope-ai/dsh-nexscope-plugin/issues"
   }
 }
