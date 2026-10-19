@@ -19,7 +19,9 @@
     "assets",
     "cordis.patch.yml",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "README.zh.md",
+    "CHANGELOG.md"
   ],
   "dsh": {
     "bundle": {

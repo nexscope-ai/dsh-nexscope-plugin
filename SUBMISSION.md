@@ -9,7 +9,7 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 - [x] GitHub Actions `CI` passes on a clean Linux runner (`npm ci`, typecheck, tests, `npm pack --dry-run`).
 - [x] `npm run build` emits `lib/`; `npm pack --dry-run` produces 18 files, 66.7 kB.
 - [x] A real MCP client/server integration test over a linked in-memory transport covers tool discovery, exact schema pass-through, multi-block text plus structured content, and upstream error results.
-- [x] The plugin installs into a fresh DSH profile with `dsh plugin --profile web add .`.
+- [x] The plugin installs into a fresh DSH profile with `dsh plugin --profile web add .` and from the packed tarball (`dsh plugin --profile web add dsh-nexscope-0.1.0.tgz`), which is the artifact npm would serve. The installed package contains `lib/`, `skills/`, `assets/`, `cordis.patch.yml`, both READMEs, and the changelog; the tarball profile's diagnostics match the plugin-free baseline.
 - [x] `dsh --profile web --dump-config` shows the `nexscope` row.
 - [x] `dsh --profile web --dump-config-schema` resolves the entry as `status: schema` and adds **no** new diagnostics compared with a plugin-free baseline.
 - [x] The installed package resolves from the profile's `node_modules` and exports `name`, `inject`, `Config`, `apply`.
