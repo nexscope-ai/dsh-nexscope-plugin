@@ -29,8 +29,7 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 
 ## Pending
 
-- [ ] **Run the manual production deploy.** The CIMD document is merged to `master` (MR !372, merge commit `eeccf2fc`). Pipeline #611828 is blocked on the manual job `nexscope-official-部署-正式环境`; run it, then confirm `https://www.nexscope.ai/.well-known/dsh-nexscope-client.json` returns `200 application/json` with no redirect and re-run one sign-in with the production client id.
-- [ ] **Merge the market index after the npm release.** MR `!372` intentionally contains only the CIMD document; the index would advertise `dsh-nexscope@0.1.0` before it exists. The ready merge branch is `merge/dsh-metadata-master`; merge it once `npm publish` succeeds.
+- [ ] **Publish the npm package first, then run the manual production deploy.** Both web changes are merged to `master`: the CIMD document (MR !372) and the market index plus icon (MR !373, merge commit `02be88b5`). The master pipeline is blocked on the manual job `nexscope-official-部署-正式环境`. Publish `dsh-nexscope@0.1.0` before running that job, otherwise `/dsh/index.json` advertises a version that cannot be installed. After the deploy, confirm `https://www.nexscope.ai/.well-known/dsh-nexscope-client.json` returns `200 application/json` with no redirect and re-run one sign-in with the production client id.
 - [ ] Delete the two temporary public CIMD repositories once the production document is live.
 - [ ] Run one asynchronous generation and verify task polling end to end. `nexscope_media_task_result` is reachable and its exact schema is `{skillSlug, taskId}`; with a fake task id it returns code `99404` without charging. The catalog marks 63 skills as `asyncTask`, all image/video generation.
 - [ ] Confirm a large result stays within the harness spill budget.
