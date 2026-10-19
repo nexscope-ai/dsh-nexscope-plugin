@@ -6,6 +6,7 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 
 - [x] `npm run typecheck` passes.
 - [x] `npm test` passes: 30 tests across three files.
+- [x] GitHub Actions `CI` passes on a clean Linux runner (`npm ci`, typecheck, tests, `npm pack --dry-run`).
 - [x] `npm run build` emits `lib/`; `npm pack --dry-run` produces 18 files, 66.7 kB.
 - [x] A real MCP client/server integration test over a linked in-memory transport covers tool discovery, exact schema pass-through, multi-block text plus structured content, and upstream error results.
 - [x] The plugin installs into a fresh DSH profile with `dsh plugin --profile web add .`.
@@ -23,6 +24,7 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 - [x] **Live paid call through the model-facing tool.** `nexscope_call_tool` ran `nexscope_1688_product_detail` with `offerId: 1040473674152`, returned `code: 0` with product and SKU data in about 2.2 s. The response reported `cost: -1`, while the account usage page recorded `research:/alibaba1688/productDetail:EN` at `-10` credits for that minute, so the real charge was 10 credits.
 - [x] **Live refresh.** After replacing the stored access token with an invalid value, the next catalog read hit 401, refreshed with the stored refresh token, saved a new access token, rotated the refresh token, and succeeded.
 - [x] **Live export.** `nexscope_export` wrote `structuredContent.data.product.skuList` to a 3-row CSV from the real result, with nested values serialized and quotes escaped.
+- [x] **Published tool surface.** Both `api.nexscope.ai` and `api-test.nexscope.ai` publish **545** tools: the 541 catalog skills plus `nexscope_media_task_result`, `nexscope_route_api`, `nexscope_jev_evaluate`, and `nexscope_seo_call_result`. Neither publishes `nexscope_workflow_*` today, so workflow tools are deploy-dependent and the passthrough surface picks them up automatically when they ship.
 
 ## Pending
 
@@ -34,9 +36,9 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 - [ ] Confirm a large result stays within the harness spill budget.
 - [ ] Verify sign-out and re-sign-in through `nexscope_sign_in`.
 - [ ] Verify `nexscope_account` with a real Nexscope API key; the OAuth-only path already reports that a key is required.
-- [ ] Exercise `nexscope_workflow_*` against `api-test.nexscope.ai`, where the workflow tools are published.
+- [ ] Exercise `nexscope_workflow_*` once a server deployment publishes them. As of this run, neither production nor test publishes them.
 - [ ] Recheck the catalog size at release time (541 catalog skills; 545 published MCP tools today).
-- [ ] Publish the npm package, then serve `market/` at `https://www.nexscope.ai/dsh/`.
+- [ ] Publish the npm package (`npm login` is required; the name `dsh-nexscope` is still unclaimed), then serve `market/` at `https://www.nexscope.ai/dsh/`.
 
 ## Design notes
 

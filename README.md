@@ -24,6 +24,15 @@ For a local checkout, install the directory instead:
 dsh plugin --profile web add /path/to/dsh-nexscope-plugin
 ```
 
+## Hosting prerequisites
+
+Two public files must exist before first use:
+
+- `https://www.nexscope.ai/.well-known/dsh-nexscope-client.json` — the OAuth client-id metadata document. The authorization server fetches it during sign-in. It is checked in under `public/dsh-nexscope-client.json`.
+- `https://www.nexscope.ai/dsh/index.json` plus `dsh/icons/nexscope.png` — the plugin market index, checked in under `market/`.
+
+Publish the npm package before pointing users at the market index; otherwise Discover lists a version that cannot be installed.
+
 ## Sign in
 
 Ask DeepSeek Harness to connect Nexscope, or call `nexscope_sign_in`. The plugin opens the Nexscope sign-in page and listens on a loopback port (`127.0.0.1:45871`–`45873`) for the callback. The OAuth grant is stored in the harness credential store and refreshed silently afterwards. No API key is needed, and nothing is pasted into chat.
