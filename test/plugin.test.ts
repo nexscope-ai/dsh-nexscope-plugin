@@ -5,9 +5,19 @@
  * search ranking, result rendering, sign-in failure paths, and credential
  * persistence. They use a fake context and never reach the network.
  */
+import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { CallToolResult, Tool } from '@modelcontextprotocol/client'
 import { NexscopeTools, renderContent, scoreTool } from '../src/tools.js'
+import {
+  assertInsideWorkspace,
+  exportDeliverable,
+  selectJsonPath,
+  serializeExport,
+  toCsv,
+} from '../src/export.js'
 import { NexscopeOAuth, SignInFailedError, SignInRequiredError } from '../src/oauth.js'
 import { resolveConfig } from '../src/config.js'
 
@@ -130,6 +140,7 @@ describe('NexscopeTools', () => {
       ctx as never,
       clientStub([]) as never,
       oauthStub() as never,
+      resolveConfig(),
     )
     tools.install(ctx.tools as never)
     expect(ctx.registered).toEqual([
@@ -138,6 +149,8 @@ describe('NexscopeTools', () => {
       'nexscope_find_tools',
       'nexscope_describe_tool',
       'nexscope_call_tool',
+      'nexscope_export',
+      'nexscope_account',
     ])
   })
 
@@ -148,7 +161,7 @@ describe('NexscopeTools', () => {
       tool('nexscope_tiktok_video', 'TikTok video analytics.'),
     ]
     const ctx = fakeContext()
-    const tools = new NexscopeTools(ctx as never, clientStub(catalog) as never, oauthStub() as never)
+    const tools = new NexscopeTools(ctx as never, clientStub(catalog) as never, oauthStub() as never, resolveConfig())
     const definitions = definitionsOf(tools)
     const find = definitions.find((definition) => definition.name === 'nexscope_find_tools')!
     const result = (await find.execute({ query: 'amazon', limit: 1 }, fakeExec())) as {
@@ -162,7 +175,7 @@ describe('NexscopeTools', () => {
 
   it('reports an unknown tool name with a search hint', async () => {
     const ctx = fakeContext()
-    const tools = new NexscopeTools(ctx as never, clientStub([tool('a', 'b')]) as never, oauthStub() as never)
+    const tools = new NexscopeTools(ctx as never, clientStub([tool('a', 'b')]) as never, oauthStub() as never, resolveConfig())
     const describeTool = definitionsOf(tools).find(
       (definition) => definition.name === 'nexscope_describe_tool',
     )!
@@ -178,7 +191,7 @@ describe('NexscopeTools', () => {
       content: [{ type: 'text', text: 'not enough credits' }],
       isError: true,
     })
-    const tools = new NexscopeTools(ctx as never, client as never, oauthStub() as never)
+    const tools = new NexscopeTools(ctx as never, client as never, oauthStub() as never, resolveConfig())
     const callTool = definitionsOf(tools).find(
       (definition) => definition.name === 'nexscope_call_tool',
     )!
@@ -200,7 +213,7 @@ describe('NexscopeTools', () => {
         _meta: { 'nexscope/billing': { consumesCredits: false } },
       } as Partial<Tool>),
     ]
-    const tools = new NexscopeTools(ctx as never, clientStub(catalog) as never, oauthStub() as never)
+    const tools = new NexscopeTools(ctx as never, clientStub(catalog) as never, oauthStub() as never, resolveConfig())
     const describeTool = definitionsOf(tools).find(
       (definition) => definition.name === 'nexscope_describe_tool',
     )!
@@ -314,3 +327,103 @@ function fakeExec() {
     concludeTurn: () => {},
   }
 }
+
+describe('export helpers', () => {
+  it('selects a dot path and a JSON pointer', () => {
+    const value = { data: { items: [{ id: 1 }, { id: 2 }] } }
+    expect(selectJsonPath(value, 'data.items')).toEqual([{ id: 1 }, { id: 2 }])
+    expect(selectJsonPath(value, '/data/items/1')).toEqual({ id: 2 })
+    expect(selectJsonPath(value, '$')).toBe(value)
+  })
+
+  it('rejects a path that does not exist', () => {
+    expect(() => selectJsonPath({ data: {} }, 'data.items')).toThrow(/does not exist/)
+  })
+
+  it('writes CSV with quoting and union columns', () => {
+    const csv = toCsv([
+      { name: 'a,b', score: 1 },
+      { name: 'say "hi"', extra: true },
+    ])
+    expect(csv.columns).toEqual(['name', 'score', 'extra'])
+    expect(csv.text).toContain('"a,b"')
+    expect(csv.text).toContain('"say ""hi"""')
+    expect(csv.rows).toBe(2)
+  })
+
+  it('rejects CSV for a non-array value', () => {
+    expect(() => toCsv({ a: 1 })).toThrow(/needs an array/)
+  })
+
+  it('serializes JSONL and JSON', () => {
+    expect(serializeExport([{ a: 1 }, { a: 2 }], 'jsonl').text).toBe('{"a":1}\n{"a":2}\n')
+    expect(serializeExport({ a: 1 }, 'json').rows).toBe(1)
+  })
+
+  it('rejects an output path that escapes the workspace', () => {
+    expect(() => assertInsideWorkspace('../escape.csv', '/tmp/work')).toThrow(/escapes/)
+    expect(assertInsideWorkspace('out.csv', '/tmp/work')).toBe('/tmp/work/out.csv')
+  })
+
+  it('writes a CSV deliverable from inline JSON', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'dsh-export-'))
+    try {
+      const output = join(directory, 'items.csv')
+      const result = await exportDeliverable(
+        fakeContext() as never,
+        {
+          json: JSON.stringify({ data: { items: [{ name: 'one' }, { name: 'two' }] } }),
+          path: 'data.items',
+          output,
+          format: 'csv',
+        },
+        new AbortController().signal,
+      )
+      expect(result.rows).toBe(2)
+      expect(await readFile(output, 'utf8')).toBe('name\none\ntwo\n')
+    } finally {
+      await rm(directory, { recursive: true, force: true })
+    }
+  })
+})
+
+describe('nexscope_account', () => {
+  it('explains the API-key requirement when no key is configured', async () => {
+    const ctx = fakeContext()
+    const tools = new NexscopeTools(ctx as never, clientStub([]) as never, oauthStub() as never, resolveConfig())
+    const account = definitionsOf(tools).find((definition) => definition.name === 'nexscope_account')!
+    const result = (await account.execute({}, fakeExec())) as {
+      available: boolean
+      source: string
+      text: string
+    }
+    expect(result.available).toBe(false)
+    expect(result.source).toBe('none')
+    expect(result.text).toContain('seller/credits')
+  })
+
+  it('reads credits with a configured API key', async () => {
+    const ctx = fakeContext()
+    ;(ctx.credentials as Record<string, unknown>).resolve = async () => ({ value: 'nk-test' })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: true,
+        json: async () => ({
+          code: 0,
+          data: { netCredit: 42, permanentCredit: 40, cycleCredit: 2, debt: 0, grossConsumedCredit: 8 },
+        }),
+      })),
+    )
+    const tools = new NexscopeTools(ctx as never, clientStub([]) as never, oauthStub() as never, resolveConfig())
+    const account = definitionsOf(tools).find((definition) => definition.name === 'nexscope_account')!
+    const result = (await account.execute({}, fakeExec())) as {
+      available: boolean
+      source: string
+      text: string
+    }
+    expect(result.available).toBe(true)
+    expect(result.source).toBe('api-key')
+    expect(result.text).toContain('Net credit: 42')
+  })
+})

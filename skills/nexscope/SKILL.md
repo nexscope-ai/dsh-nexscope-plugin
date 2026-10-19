@@ -12,6 +12,8 @@ Nexscope publishes a large catalog of read-only ecommerce data capabilities behi
 | `nexscope_find_tools` | Search the catalog by keyword when the tool name is unknown. |
 | `nexscope_describe_tool` | Read one tool's exact input schema. Always call this before a paid call. |
 | `nexscope_call_tool` | Invoke one published tool by name. |
+| `nexscope_export` | Turn a JSON result into a CSV, JSON, or JSONL file. |
+| `nexscope_account` | Report the credit balance and recent usage. |
 
 `nexscope_status` reports the connection, and `nexscope_sign_in` starts a browser sign-in when the connection is missing.
 
@@ -67,9 +69,29 @@ When the result is large, the plugin may save the full value and return a path. 
 
 ## 7. Save deliverables
 
-When the user asks for a file, write the requested rows to the workspace and return a link. Keep the original JSON available so a later export does not require a second paid call. Do not claim a file exists until the write succeeds.
+When the user asks for a file, convert the JSON you already have with `nexscope_export` instead of making a second paid call:
 
-## 8. Handle mutations and account data carefully
+- Pass the exact array path the response uses, for example `data.items`. Read it from the response; never assume `data.items` exists.
+- Choose `csv` for tabular deliverables, `json` for a faithful copy, and `jsonl` for one-record-per-line data.
+- Keep the original JSON available so a later export does not need another paid call.
+- Do not claim a file exists until the tool reports the written path.
+
+## 8. Workflows and the canvas
+
+When the server publishes `nexscope_workflow_*` tools, use them through `nexscope_call_tool`:
+
+- `nexscope_workflow_draft` and `nexscope_workflow_read` work headlessly and are safe to use for plan drafts and reading run results.
+- `nexscope_workflow_open`, `nexscope_workflow_host`, and `nexscope_workflow_media_select` drive an interactive canvas. DeepSeek Harness has no canvas host, so do not promise a visual canvas; if one of those tools returns a host or UI error, report it and fall back to the draft/read tools.
+
+## 9. Account and credits
+
+Call `nexscope_account` before a large batch of paid work and whenever the user asks about balance or usage.
+
+- The balance needs a Nexscope API key; OAuth alone cannot read it because the account endpoints accept API keys only. If the tool reports that no key is configured, say so and point the user to https://www.nexscope.ai/seller/credits.
+- Never ask the user to paste a key into chat. It is read from the harness credential store.
+- When a paid call reports insufficient credits, report the balance problem and the recharge location from the response. Do not retry until the user confirms a recharge.
+
+## 10. Handle mutations and account data carefully
 
 Some capabilities change external state, such as advertising operations. For those:
 

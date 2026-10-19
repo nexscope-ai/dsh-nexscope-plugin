@@ -10,6 +10,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import {
   Client,
+  OAuthError,
   StreamableHTTPClientTransport,
   UnauthorizedError,
   type CallToolResult,
@@ -27,11 +28,14 @@ export interface McpSession {
 
 /** Errors that need a fresh browser sign-in. */
 function isAuthFailure(error: unknown): boolean {
-  if (error instanceof UnauthorizedError) return true
+  if (error instanceof UnauthorizedError || error instanceof OAuthError) return true
   const message = describe(error).toLowerCase()
   return (
     message.includes('unauthorized') ||
     message.includes('invalid_token') ||
+    message.includes('invalid_grant') ||
+    message.includes('invalid_client') ||
+    message.includes('invalid_target') ||
     message.includes('401')
   )
 }

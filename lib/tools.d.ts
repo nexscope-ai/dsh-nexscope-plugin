@@ -21,8 +21,9 @@ import type { ContentBlock, Tool } from '@modelcontextprotocol/client';
 import type { JsonValue } from '@deepseek-ai/dsh-util-values';
 import type { NexscopeClient } from './client.js';
 import type { NexscopeOAuth } from './oauth.js';
+import type { ResolvedConfig } from './config.js';
 /** Tools this plugin owns, which an upstream tool must never shadow. */
-export declare const OWNED_TOOLS: readonly ["nexscope_sign_in", "nexscope_status", "nexscope_find_tools", "nexscope_describe_tool", "nexscope_call_tool"];
+export declare const OWNED_TOOLS: readonly ["nexscope_sign_in", "nexscope_status", "nexscope_find_tools", "nexscope_describe_tool", "nexscope_call_tool", "nexscope_export", "nexscope_account"];
 /** Render MCP content blocks as model text. */
 export declare function renderContent(content: readonly ContentBlock[]): string;
 /** Lossless JSON copy of an upstream value. */
@@ -36,9 +37,10 @@ export declare class NexscopeTools {
     private readonly ctx;
     private readonly client;
     private readonly oauth;
+    private readonly config;
     private readonly disposers;
     private catalog?;
-    constructor(ctx: Context, client: NexscopeClient, oauth: NexscopeOAuth);
+    constructor(ctx: Context, client: NexscopeClient, oauth: NexscopeOAuth, config: ResolvedConfig);
     /** Register every owned tool. */
     install(tools?: ToolRuntime): void;
     /** Remove every registration. */
@@ -47,6 +49,10 @@ export declare class NexscopeTools {
     invalidateCatalog(): void;
     /** The five owned tool definitions. */
     private definitions;
+    /** Resolve the optional Nexscope API key from the credential store. */
+    private apiKey;
+    /** Call one Nexscope REST endpoint with the API key. */
+    private rest;
     /** The configured endpoint. */
     private endpoint;
     /** The catalog, cached until invalidated. */

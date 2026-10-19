@@ -73,7 +73,7 @@ export function apply(ctx: Context, config: ResolvedConfig = resolveConfig()): v
   const resolved = resolveConfig(config)
   const oauth = new NexscopeOAuth(ctx, resolved)
   const client = new NexscopeClient(ctx, resolved, oauth)
-  const tools = new NexscopeTools(ctx, client, oauth)
+  const tools = new NexscopeTools(ctx, client, oauth, resolved)
 
   tools.install(ctx.tools)
   ctx.skills.registerProvider(() => skillProvider)

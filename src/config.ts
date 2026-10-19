@@ -8,6 +8,9 @@ import Schema from '@deepseek-ai/schemastery'
 /** Default MCP endpoint used for the Nexscope v2 skill API. */
 export const DEFAULT_MCP_URL = 'https://api.nexscope.ai/api/skill-api/v2/mcp'
 
+/** Default REST origin used for the optional account query. */
+export const DEFAULT_API_BASE = 'https://api.nexscope.ai'
+
 /** Default OAuth scope required by the Nexscope MCP resource. */
 export const DEFAULT_SCOPE = 'mcp:tools'
 
@@ -30,6 +33,12 @@ export const Config = Schema.object({
     'Streamable HTTP MCP endpoint for the Nexscope skill API.',
   ),
   scope: Schema.string().default(DEFAULT_SCOPE).description('OAuth scope requested at sign-in.'),
+  apiBase: Schema.string().default(DEFAULT_API_BASE).description(
+    'REST origin used by the optional account query.',
+  ),
+  apiKeyEnv: Schema.string().default('NEXSCOPE_API_KEY').description(
+    'Credential reference holding a Nexscope API key for the account query. Optional.',
+  ),
   clientMetadataUrl: Schema.string().default(DEFAULT_CLIENT_METADATA_URL).description(
     'Public client metadata document used as the OAuth client_id.',
   ),
@@ -48,6 +57,8 @@ export const Config = Schema.object({
 export interface ResolvedConfig {
   readonly mcpUrl: string
   readonly scope: string
+  readonly apiBase: string
+  readonly apiKeyEnv: string
   readonly clientMetadataUrl: string
   readonly signInTimeoutMs: number
   readonly toolCallTimeoutMs: number
@@ -63,6 +74,8 @@ export function resolveConfig(config: Partial<ResolvedConfig> = {}): ResolvedCon
   return {
     mcpUrl: config.mcpUrl ?? DEFAULT_MCP_URL,
     scope: config.scope ?? DEFAULT_SCOPE,
+    apiBase: config.apiBase ?? DEFAULT_API_BASE,
+    apiKeyEnv: config.apiKeyEnv ?? 'NEXSCOPE_API_KEY',
     clientMetadataUrl: config.clientMetadataUrl ?? DEFAULT_CLIENT_METADATA_URL,
     signInTimeoutMs: config.signInTimeoutMs ?? 300_000,
     toolCallTimeoutMs: config.toolCallTimeoutMs ?? 120_000,

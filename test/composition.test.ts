@@ -57,6 +57,8 @@ describe('plugin composition', () => {
       'nexscope_find_tools',
       'nexscope_describe_tool',
       'nexscope_call_tool',
+      'nexscope_export',
+      'nexscope_account',
     ]) {
       expect(toolRegistry.get(owned), `${owned} should be registered`).toBeDefined()
     }

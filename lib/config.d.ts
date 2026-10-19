@@ -6,6 +6,8 @@
 import Schema from '@deepseek-ai/schemastery';
 /** Default MCP endpoint used for the Nexscope v2 skill API. */
 export declare const DEFAULT_MCP_URL = "https://api.nexscope.ai/api/skill-api/v2/mcp";
+/** Default REST origin used for the optional account query. */
+export declare const DEFAULT_API_BASE = "https://api.nexscope.ai";
 /** Default OAuth scope required by the Nexscope MCP resource. */
 export declare const DEFAULT_SCOPE = "mcp:tools";
 /**
@@ -22,6 +24,8 @@ export declare const CALLBACK_PATH = "/callback";
 export declare const Config: Schema<Schemastery.ObjectS<NoInfer<{
     mcpUrl: Schema<string, string, "defined">;
     scope: Schema<string, string, "defined">;
+    apiBase: Schema<string, string, "defined">;
+    apiKeyEnv: Schema<string, string, "defined">;
     clientMetadataUrl: Schema<string, string, "defined">;
     signInTimeoutMs: Schema<number, number, "defined">;
     toolCallTimeoutMs: Schema<number, number, "defined">;
@@ -29,6 +33,8 @@ export declare const Config: Schema<Schemastery.ObjectS<NoInfer<{
 }>>, Schemastery.ObjectT<NoInfer<{
     mcpUrl: Schema<string, string, "defined">;
     scope: Schema<string, string, "defined">;
+    apiBase: Schema<string, string, "defined">;
+    apiKeyEnv: Schema<string, string, "defined">;
     clientMetadataUrl: Schema<string, string, "defined">;
     signInTimeoutMs: Schema<number, number, "defined">;
     toolCallTimeoutMs: Schema<number, number, "defined">;
@@ -38,6 +44,8 @@ export declare const Config: Schema<Schemastery.ObjectS<NoInfer<{
 export interface ResolvedConfig {
     readonly mcpUrl: string;
     readonly scope: string;
+    readonly apiBase: string;
+    readonly apiKeyEnv: string;
     readonly clientMetadataUrl: string;
     readonly signInTimeoutMs: number;
     readonly toolCallTimeoutMs: number;
