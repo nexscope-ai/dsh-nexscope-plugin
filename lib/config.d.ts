@@ -25,7 +25,6 @@ export declare const Config: Schema<Schemastery.ObjectS<NoInfer<{
     clientMetadataUrl: Schema<string, string, "defined">;
     signInTimeoutMs: Schema<number, number, "defined">;
     toolCallTimeoutMs: Schema<number, number, "defined">;
-    maxInlineBytes: Schema<number, number, "defined">;
     callbackPorts: Schema<number[], number[], "defined">;
 }>>, Schemastery.ObjectT<NoInfer<{
     mcpUrl: Schema<string, string, "defined">;
@@ -33,7 +32,6 @@ export declare const Config: Schema<Schemastery.ObjectS<NoInfer<{
     clientMetadataUrl: Schema<string, string, "defined">;
     signInTimeoutMs: Schema<number, number, "defined">;
     toolCallTimeoutMs: Schema<number, number, "defined">;
-    maxInlineBytes: Schema<number, number, "defined">;
     callbackPorts: Schema<number[], number[], "defined">;
 }>>, "plain">;
 /** Resolved configuration with every default applied. */
@@ -43,7 +41,6 @@ export interface ResolvedConfig {
     readonly clientMetadataUrl: string;
     readonly signInTimeoutMs: number;
     readonly toolCallTimeoutMs: number;
-    readonly maxInlineBytes: number;
     readonly callbackPorts: readonly number[];
 }
 /**

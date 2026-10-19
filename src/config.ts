@@ -39,9 +39,6 @@ export const Config = Schema.object({
   toolCallTimeoutMs: Schema.natural().default(120_000).description(
     'Per-call MCP timeout in milliseconds.',
   ),
-  maxInlineBytes: Schema.natural().default(60_000).description(
-    'Largest tool result kept inline before it is written to a file.',
-  ),
   callbackPorts: Schema.array(Schema.natural()).default([45871, 45872, 45873]).description(
     'Loopback ports tried for the OAuth callback listener.',
   ),
@@ -54,7 +51,6 @@ export interface ResolvedConfig {
   readonly clientMetadataUrl: string
   readonly signInTimeoutMs: number
   readonly toolCallTimeoutMs: number
-  readonly maxInlineBytes: number
   readonly callbackPorts: readonly number[]
 }
 
@@ -70,7 +66,6 @@ export function resolveConfig(config: Partial<ResolvedConfig> = {}): ResolvedCon
     clientMetadataUrl: config.clientMetadataUrl ?? DEFAULT_CLIENT_METADATA_URL,
     signInTimeoutMs: config.signInTimeoutMs ?? 300_000,
     toolCallTimeoutMs: config.toolCallTimeoutMs ?? 120_000,
-    maxInlineBytes: config.maxInlineBytes ?? 60_000,
     callbackPorts:
       config.callbackPorts !== undefined && config.callbackPorts.length > 0
         ? [...config.callbackPorts]

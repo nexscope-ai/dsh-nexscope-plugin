@@ -65,7 +65,6 @@ Defaults are usually correct. Override them in the profile patch:
   config:
     callbackPorts: [45871, 45872, 45873]
     toolCallTimeoutMs: 120000
-    maxInlineBytes: 60000
 ```
 
 | Field | Default | Meaning |
@@ -75,7 +74,6 @@ Defaults are usually correct. Override them in the profile patch:
 | `clientMetadataUrl` | `https://www.nexscope.ai/.well-known/dsh-nexscope-client.json` | Public client identity document. |
 | `signInTimeoutMs` | `300000` | How long a pending sign-in stays open. |
 | `toolCallTimeoutMs` | `120000` | Per-call MCP timeout. |
-| `maxInlineBytes` | `60000` | Results larger than this are reported with a size hint. |
 | `callbackPorts` | `[45871, 45872, 45873]` | Loopback ports tried for the OAuth callback. |
 
 ## Development
