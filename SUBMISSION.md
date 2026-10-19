@@ -26,7 +26,9 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 
 ## Pending
 
-- [ ] **Publish the client metadata document.** Serve `public/dsh-nexscope-client.json` at `https://www.nexscope.ai/.well-known/dsh-nexscope-client.json` as `application/json`, status 200, no redirects. This verification used the temporary document at `https://cdn.jsdelivr.net/gh/TANAGELEEE/dsh-oauth-client-test@main/client.json`, so production sign-in with the shipped client id still needs this deployment.
+- [ ] **Merge the web change and deploy.** The document and market assets are merged into the web repository's `test` branch (`hotfix/20261019-dsh-plugin-metadata`, merge commit `c41f59d7`). `master` is protected, so the merge branch `merge/dsh-metadata-master` is pushed and an MR is required:
+  `https://git.ziniao.com/nexscope/cient/web/-/merge_requests/new?merge_request%5Bsource_branch%5D=merge%2Fdsh-metadata-master`
+  After the production deploy, confirm `https://www.nexscope.ai/.well-known/dsh-nexscope-client.json` returns `200 application/json` with no redirect. This verification used the temporary document at `https://cdn.jsdelivr.net/gh/TANAGELEEE/dsh-oauth-client-test@main/client.json`, so production sign-in with the shipped client id still needs this deploy.
 - [ ] Delete the two temporary public CIMD repositories once the production document is live.
 - [ ] Run one asynchronous call and verify task polling end to end; the catalog marks 63 skills as `asyncTask`.
 - [ ] Confirm a large result stays within the harness spill budget.
