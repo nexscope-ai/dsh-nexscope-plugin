@@ -87,7 +87,7 @@ When the server publishes `nexscope_workflow_*` tools, use them through `nexscop
 
 Call `nexscope_account` before a large batch of paid work and whenever the user asks about balance or usage.
 
-- The balance needs a Nexscope API key; OAuth alone cannot read it because the account endpoints accept API keys only. If the tool reports that no key is configured, say so and point the user to https://www.nexscope.ai/seller/credits.
+- The balance needs a Nexscope API key; OAuth alone cannot read it because the account endpoints accept API keys only. If the tool reports that no key is configured, say so, point the user to https://www.nexscope.ai/seller/credits, and mention that `NEXSCOPE_API_KEY` in `~/.dsh/.env` enables the query.
 - Never ask the user to paste a key into chat. It is read from the harness credential store.
 - When a paid call reports insufficient credits, report the balance problem and the recharge location from the response. Do not retry until the user confirms a recharge.
 

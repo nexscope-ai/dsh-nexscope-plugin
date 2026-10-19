@@ -609,7 +609,7 @@ export class NexscopeTools {
             'Credit balance is not readable with OAuth alone: the Nexscope account endpoints accept an API key, and the MCP server does not publish an account tool yet.',
             '',
             'Check the balance at https://www.nexscope.ai/seller/credits.',
-            `To let this plugin report it here, set ${self.config.apiKeyEnv} to a Nexscope API key in the credential store.`,
+            `To let this plugin report it here, add ${self.config.apiKeyEnv}=nk-... to ~/.dsh/.env or the DSH credential store, then restart the profile.`,
             'An insufficient-credits error from a paid call still returns its own recharge guidance.',
           ].join('\n'),
         }

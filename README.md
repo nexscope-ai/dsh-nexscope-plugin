@@ -77,7 +77,7 @@ Defaults are usually correct. Override them in the profile patch:
 | `signInTimeoutMs` | `300000` | How long a pending sign-in stays open. |
 | `toolCallTimeoutMs` | `120000` | Per-call MCP timeout. |
 | `apiBase` | `https://api.nexscope.ai` | REST origin used by the account query. |
-| `apiKeyEnv` | `NEXSCOPE_API_KEY` | Optional credential holding an API key for the account query. |
+| `apiKeyEnv` | `NEXSCOPE_API_KEY` | Optional credential holding an API key for the account query. Add `NEXSCOPE_API_KEY=nk-...` to `~/.dsh/.env` or the DSH credential store, then restart the profile. |
 | `callbackPorts` | `[45871, 45872, 45873]` | Loopback ports tried for the OAuth callback. |
 
 ## Parity with the existing plugins

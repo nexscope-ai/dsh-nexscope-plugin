@@ -19,7 +19,7 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 - [x] The market index validates with `parseMarketIndex` from `@deepseek-ai/dsh-plugin-market-index`.
 - [x] **Live OAuth sign-in against production.** The browser flow completed with the CIMD client, the loopback callback received the code, and the token exchange stored a grant with a refresh token (`expires_in: 899`, `scope: mcp:tools`).
 - [x] **Live catalog read.** The plugin connected to `https://api.nexscope.ai/api/skill-api/v2/mcp` and listed **545** published tools.
-- [x] **Live paid call through the model-facing tool.** `nexscope_call_tool` ran `nexscope_1688_product_detail` with `offerId: 1040473674152`, returned `code: 0` with product and SKU data in about 2.2 s, and reported `cost: -1` for that call.
+- [x] **Live paid call through the model-facing tool.** `nexscope_call_tool` ran `nexscope_1688_product_detail` with `offerId: 1040473674152`, returned `code: 0` with product and SKU data in about 2.2 s. The response reported `cost: -1`, while the account usage page recorded `research:/alibaba1688/productDetail:EN` at `-10` credits for that minute, so the real charge was 10 credits.
 - [x] **Live refresh.** After replacing the stored access token with an invalid value, the next catalog read hit 401, refreshed with the stored refresh token, saved a new access token, rotated the refresh token, and succeeded.
 - [x] **Live export.** `nexscope_export` wrote `structuredContent.data.product.skuList` to a 3-row CSV from the real result, with nested values serialized and quotes escaped.
 
