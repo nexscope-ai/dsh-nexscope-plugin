@@ -432,6 +432,28 @@ describe('export helpers', () => {
     expect(assertInsideWorkspace('out.csv', '/tmp/work')).toBe('/tmp/work/out.csv')
   })
 
+  it('passes the session working directory to the filesystem service', async () => {
+    const calls: Array<{ path: string; cwd: unknown }> = []
+    const fs = {
+      resolve: async (path: string, options: { cwd?: unknown }) => {
+        calls.push({ path, cwd: options.cwd })
+        return { targetKey: path, displayPath: path }
+      },
+      readText: async () => '{"items":[{"a":1}]}',
+      writeText: async () => undefined,
+    }
+    const ctx = { ...fakeContext(), fs }
+    await exportDeliverable(
+      ctx as never,
+      { input: 'in.json', path: 'items', output: 'out.csv', format: 'csv', cwd: '/tmp/session' },
+      new AbortController().signal,
+    )
+    expect(calls).toEqual([
+      { path: '/tmp/session/in.json', cwd: '/tmp/session' },
+      { path: '/tmp/session/out.csv', cwd: '/tmp/session' },
+    ])
+  })
+
   it('writes a CSV deliverable from inline JSON', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'dsh-export-'))
     try {

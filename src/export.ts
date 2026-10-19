@@ -156,10 +156,15 @@ export function serializeExport(
 }
 
 /** Read a workspace file, preferring the harness filesystem service. */
-async function readSource(ctx: Context, path: string, signal: AbortSignal): Promise<string> {
+async function readSource(
+  ctx: Context,
+  path: string,
+  cwd: string,
+  signal: AbortSignal,
+): Promise<string> {
   const fs = (ctx as Context & { fs?: FsLike }).fs
   if (fs !== undefined) {
-    const target = await fs.resolve(path, { signal })
+    const target = await fs.resolve(path, { cwd, signal })
     return fs.readText(target, signal)
   }
   return readFile(path, 'utf8')
@@ -169,12 +174,13 @@ async function readSource(ctx: Context, path: string, signal: AbortSignal): Prom
 async function writeTarget(
   ctx: Context,
   path: string,
+  cwd: string,
   text: string,
   signal: AbortSignal,
 ): Promise<void> {
   const fs = (ctx as Context & { fs?: FsLike }).fs
   if (fs !== undefined) {
-    const target = await fs.resolve(path, { signal })
+    const target = await fs.resolve(path, { cwd, signal })
     await fs.writeText(target, text, undefined, signal)
     return
   }
@@ -219,7 +225,7 @@ export async function exportDeliverable(
   }
   const raw =
     options.input !== undefined
-      ? await readSource(ctx, assertInsideWorkspace(options.input, cwd), signal)
+      ? await readSource(ctx, assertInsideWorkspace(options.input, cwd), cwd, signal)
       : options.json ?? ''
   let decoded: unknown
   try {
@@ -232,7 +238,7 @@ export async function exportDeliverable(
     : selectJsonPath(decoded, options.path)
   const converted = serializeExport(selected, options.format, options.columns)
   const output = assertInsideWorkspace(options.output, cwd)
-  await writeTarget(ctx, output, converted.text, signal)
+  await writeTarget(ctx, output, cwd, converted.text, signal)
   return {
     output: options.output,
     rows: converted.rows,

@@ -2,6 +2,8 @@
 
 Ecommerce research in DeepSeek Harness with [Nexscope](https://www.nexscope.ai). Research products, keywords, markets, competitors, reviews, and advertising across Amazon, TikTok, Temu, Shopee, 1688, eBay, Etsy, and Walmart, then save the results as files.
 
+English | [中文](README.zh.md)
+
 This is a [DSH plugin bundle](https://deepseek-harness.github.io/deepseek-harness/en/develop/basic/publish). It connects the Nexscope MCP server over OAuth, adds a searchable tool surface over the published catalog, and bundles a `nexscope` skill with the routing, credit, and error-handling rules.
 
 ## Requirements
