@@ -20,6 +20,17 @@ export declare class SignInRequiredError extends Error {
 export declare class SignInFailedError extends Error {
     constructor(message: string);
 }
+/**
+ * Check the public client-metadata document before sending the user to the
+ * authorization server. The server fetches this document itself, so a missing
+ * or mismatched document would otherwise surface as a browser error page and
+ * a five-minute timeout.
+ *
+ * @param clientMetadataUrl - the URL used as the OAuth client id.
+ * @param redirectUri - the loopback callback this attempt will advertise.
+ * @param fetchFn - override for tests.
+ */
+export declare function checkClientMetadata(clientMetadataUrl: string, redirectUri: string, fetchFn?: typeof fetch): Promise<void>;
 /** One completed browser sign-in. */
 export interface SignInResult {
     readonly status: 'signed-in' | 'already-signed-in';

@@ -65,6 +65,67 @@ export class SignInFailedError extends Error {
   }
 }
 
+/**
+ * Check the public client-metadata document before sending the user to the
+ * authorization server. The server fetches this document itself, so a missing
+ * or mismatched document would otherwise surface as a browser error page and
+ * a five-minute timeout.
+ *
+ * @param clientMetadataUrl - the URL used as the OAuth client id.
+ * @param redirectUri - the loopback callback this attempt will advertise.
+ * @param fetchFn - override for tests.
+ */
+export async function checkClientMetadata(
+  clientMetadataUrl: string,
+  redirectUri: string,
+  fetchFn: typeof fetch = fetch,
+): Promise<void> {
+  let response: Response
+  try {
+    response = await fetchFn(clientMetadataUrl, {
+      redirect: 'error',
+      signal: AbortSignal.timeout(10_000),
+      headers: { accept: 'application/json' },
+    })
+  } catch (error) {
+    throw new SignInFailedError(
+      `The Nexscope sign-in metadata document is not reachable at ${clientMetadataUrl}: ${describe(error)}`,
+    )
+  }
+  if (!response.ok) {
+    throw new SignInFailedError(
+      `The Nexscope sign-in metadata document is not published at ${clientMetadataUrl} (HTTP ${response.status}).`,
+    )
+  }
+  const contentType = (response.headers.get('content-type') ?? '').split(';')[0]?.trim()
+  if (contentType !== 'application/json') {
+    throw new SignInFailedError(
+      `The Nexscope sign-in metadata document at ${clientMetadataUrl} is served as "${contentType ?? 'unknown'}", not application/json.`,
+    )
+  }
+  const document = (await response.json().catch(() => undefined)) as
+    | { client_id?: unknown; redirect_uris?: unknown }
+    | undefined
+  if (document === undefined) {
+    throw new SignInFailedError(
+      `The Nexscope sign-in metadata document at ${clientMetadataUrl} is not valid JSON.`,
+    )
+  }
+  if (document.client_id !== clientMetadataUrl) {
+    throw new SignInFailedError(
+      `The Nexscope sign-in metadata document must set client_id to ${clientMetadataUrl}.`,
+    )
+  }
+  const redirects = Array.isArray(document.redirect_uris)
+    ? document.redirect_uris.filter((value): value is string => typeof value === 'string')
+    : []
+  if (!redirects.includes(redirectUri)) {
+    throw new SignInFailedError(
+      `The Nexscope sign-in metadata document does not list the callback ${redirectUri}. Add it to redirect_uris there and retry.`,
+    )
+  }
+}
+
 /** One completed browser sign-in. */
 export interface SignInResult {
   readonly status: 'signed-in' | 'already-signed-in'
@@ -258,6 +319,7 @@ export class NexscopeOAuth {
     const pending = await this.startCallbackListener()
     this.pending = pending
     try {
+      await checkClientMetadata(this.config.clientMetadataUrl, pending.redirectUri)
       await auth(this.provider, { serverUrl: this.config.mcpUrl })
       const callback = await pending.done
       const result = await auth(this.provider, {

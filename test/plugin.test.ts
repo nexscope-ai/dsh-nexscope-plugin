@@ -18,7 +18,7 @@ import {
   serializeExport,
   toCsv,
 } from '../src/export.js'
-import { NexscopeOAuth, SignInFailedError, SignInRequiredError } from '../src/oauth.js'
+import { NexscopeOAuth, SignInFailedError, checkClientMetadata } from '../src/oauth.js'
 import { resolveConfig } from '../src/config.js'
 
 /** Minimal credential store used by the OAuth tests. */
@@ -225,6 +225,51 @@ describe('NexscopeTools', () => {
     }
     expect(paid.consumesCredits).toBe(true)
     expect(free.consumesCredits).toBe(false)
+  })
+})
+
+describe('checkClientMetadata', () => {
+  const url = 'https://www.nexscope.ai/.well-known/dsh-nexscope-client.json'
+  const redirect = 'http://127.0.0.1:45871/callback'
+
+  it('accepts a matching document', async () => {
+    const fetchFn = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      headers: new Headers({ 'content-type': 'application/json; charset=utf-8' }),
+      json: async () => ({ client_id: url, redirect_uris: [redirect] }),
+    })) as unknown as typeof fetch
+    await expect(checkClientMetadata(url, redirect, fetchFn)).resolves.toBeUndefined()
+  })
+
+  it('rejects a missing document', async () => {
+    const fetchFn = vi.fn(async () => ({
+      ok: false,
+      status: 404,
+      headers: new Headers({ 'content-type': 'text/html' }),
+      json: async () => ({}),
+    })) as unknown as typeof fetch
+    await expect(checkClientMetadata(url, redirect, fetchFn)).rejects.toThrow(/not published/)
+  })
+
+  it('rejects a client_id mismatch', async () => {
+    const fetchFn = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ client_id: 'https://example.test/other.json', redirect_uris: [redirect] }),
+    })) as unknown as typeof fetch
+    await expect(checkClientMetadata(url, redirect, fetchFn)).rejects.toThrow(/must set client_id/)
+  })
+
+  it('rejects a document that omits the callback', async () => {
+    const fetchFn = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ client_id: url, redirect_uris: ['http://127.0.0.1:1/callback'] }),
+    })) as unknown as typeof fetch
+    await expect(checkClientMetadata(url, redirect, fetchFn)).rejects.toThrow(/does not list the callback/)
   })
 })
 
