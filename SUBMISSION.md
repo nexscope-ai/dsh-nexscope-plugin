@@ -30,7 +30,7 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
   `https://git.ziniao.com/nexscope/cient/web/-/merge_requests/new?merge_request%5Bsource_branch%5D=merge%2Fdsh-metadata-master`
   After the production deploy, confirm `https://www.nexscope.ai/.well-known/dsh-nexscope-client.json` returns `200 application/json` with no redirect. This verification used the temporary document at `https://cdn.jsdelivr.net/gh/TANAGELEEE/dsh-oauth-client-test@main/client.json`, so production sign-in with the shipped client id still needs this deploy.
 - [ ] Delete the two temporary public CIMD repositories once the production document is live.
-- [ ] Run one asynchronous call and verify task polling end to end; the catalog marks 63 skills as `asyncTask`.
+- [ ] Run one asynchronous generation and verify task polling end to end. `nexscope_media_task_result` is reachable and its exact schema is `{skillSlug, taskId}`; with a fake task id it returns code `99404` without charging. The catalog marks 63 skills as `asyncTask`, all image/video generation.
 - [ ] Confirm a large result stays within the harness spill budget.
 - [ ] Verify sign-out and re-sign-in through `nexscope_sign_in`.
 - [ ] Verify `nexscope_account` with a real Nexscope API key; the OAuth-only path already reports that a key is required.
