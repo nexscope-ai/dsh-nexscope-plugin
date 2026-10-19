@@ -43,11 +43,12 @@ Sign-in uses OAuth 2.1 Authorization Code with PKCE, with `https://www.nexscope.
 
 ## Tools
 
-The Nexscope server publishes more than 500 tools. Registering every schema would cost a large part of the context window on every turn, so the plugin registers five tools instead:
+The Nexscope server publishes more than 500 tools. Registering every schema would cost a large part of the context window on every turn, so the plugin registers eight tools instead:
 
 | Tool | Purpose |
 | --- | --- |
 | `nexscope_sign_in` | Start the browser sign-in and store the grant. |
+| `nexscope_sign_out` | Remove the stored grant and close the session. |
 | `nexscope_status` | Report connection state, endpoint, and catalog size. Free. |
 | `nexscope_find_tools` | Search the catalog by keyword. Free. |
 | `nexscope_describe_tool` | Return one tool's exact input schema and whether it spends credits. Free. |
@@ -111,7 +112,7 @@ npm test
 npm run build
 ```
 
-`npm test` runs unit tests for catalog search, result rendering, export conversion, account handling, and the OAuth callback paths; an MCP integration test over a linked in-memory transport; and a composition test that mounts the plugin on real Cordis services and asserts that the bundled skill and all seven tools are registered.
+`npm test` runs unit tests for catalog search, result rendering, export conversion, account handling, and the OAuth callback paths; an MCP integration test over a linked in-memory transport; and a composition test that mounts the plugin on real Cordis services and asserts that the bundled skill and all eight tools are registered.
 
 ## Security notes
 

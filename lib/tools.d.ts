@@ -23,7 +23,7 @@ import type { NexscopeClient } from './client.js';
 import type { NexscopeOAuth } from './oauth.js';
 import type { ResolvedConfig } from './config.js';
 /** Tools this plugin owns, which an upstream tool must never shadow. */
-export declare const OWNED_TOOLS: readonly ["nexscope_sign_in", "nexscope_status", "nexscope_find_tools", "nexscope_describe_tool", "nexscope_call_tool", "nexscope_export", "nexscope_account"];
+export declare const OWNED_TOOLS: readonly ["nexscope_sign_in", "nexscope_sign_out", "nexscope_status", "nexscope_find_tools", "nexscope_describe_tool", "nexscope_call_tool", "nexscope_export", "nexscope_account"];
 /** Render MCP content blocks as model text. */
 export declare function renderContent(content: readonly ContentBlock[]): string;
 /** Lossless JSON copy of an upstream value. */

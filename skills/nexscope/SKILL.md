@@ -25,7 +25,7 @@ If the request is ambiguous about marketplace, product, or target market, ask on
 
 ## 2. Check the connection
 
-Call `nexscope_status`. If it reports `connected: false`, call `nexscope_sign_in`. That opens the Nexscope sign-in page in the browser and waits for the loopback callback. Tell the user a browser window is opening and that they should finish signing in there; do not ask for an API key, password, or verification code in chat.
+Call `nexscope_status`. If it reports `connected: false`, call `nexscope_sign_in`. If the user asks to disconnect or switch accounts, call `nexscope_sign_out` first. That opens the Nexscope sign-in page in the browser and waits for the loopback callback. Tell the user a browser window is opening and that they should finish signing in there; do not ask for an API key, password, or verification code in chat.
 
 After sign-in succeeds, continue the original task. If sign-in fails or times out, report the actual error and stop.
 

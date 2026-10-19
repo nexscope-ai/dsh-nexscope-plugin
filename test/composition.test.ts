@@ -53,6 +53,7 @@ describe('plugin composition', () => {
     }
     for (const owned of [
       'nexscope_sign_in',
+      'nexscope_sign_out',
       'nexscope_status',
       'nexscope_find_tools',
       'nexscope_describe_tool',

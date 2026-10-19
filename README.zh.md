@@ -24,11 +24,12 @@ dsh plugin --profile web add dsh-nexscope
 
 ## 工具
 
-Nexscope 发布 500 多个工具。全部注册会占用大量上下文，因此插件只注册七个：
+Nexscope 发布 500 多个工具。全部注册会占用大量上下文，因此插件只注册八个：
 
 | 工具 | 用途 |
 | --- | --- |
 | `nexscope_sign_in` | 打开浏览器并保存授权 |
+| `nexscope_sign_out` | 删除已保存的授权并关闭连接 |
 | `nexscope_status` | 查看连接状态与目录工具数 |
 | `nexscope_find_tools` | 按关键词搜索能力目录 |
 | `nexscope_describe_tool` | 读取某个工具的精确输入 schema，并提示是否消耗 credits |

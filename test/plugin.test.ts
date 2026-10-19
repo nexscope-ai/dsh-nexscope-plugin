@@ -98,6 +98,7 @@ function oauthStub() {
     hasAccessToken: async () => true,
     hasGrant: async () => true,
     signIn: async () => ({ status: 'signed-in', redirectUri: 'http://127.0.0.1:45871/callback' }),
+    signOut: async () => {},
   }
 }
 
@@ -146,6 +147,7 @@ describe('NexscopeTools', () => {
     tools.install(ctx.tools as never)
     expect(ctx.registered).toEqual([
       'nexscope_sign_in',
+      'nexscope_sign_out',
       'nexscope_status',
       'nexscope_find_tools',
       'nexscope_describe_tool',
@@ -354,6 +356,32 @@ describe('NexscopeOAuth', () => {
     } finally {
       pending.close()
     }
+  })
+
+  it('removes the grant and closes the session on sign-out', async () => {
+    const ctx = fakeContext()
+    let signedOut = 0
+    let reset = 0
+    const oauth = {
+      hasGrant: async () => true,
+      signOut: async () => {
+        signedOut += 1
+      },
+    }
+    const tools = new NexscopeTools(
+      ctx as never,
+      { ...clientStub([]), reset: async () => {
+        reset += 1
+      } } as never,
+      oauth as never,
+      resolveConfig(),
+    )
+    const signOut = definitionsOf(tools).find((definition) => definition.name === 'nexscope_sign_out')!
+    const result = (await signOut.execute({}, fakeExec())) as { signedOut: boolean; detail: string }
+    expect(result.signedOut).toBe(true)
+    expect(result.detail).toContain('nexscope_sign_in')
+    expect(signedOut).toBe(1)
+    expect(reset).toBe(1)
   })
 
   it('clears the stored grant on sign-out', async () => {

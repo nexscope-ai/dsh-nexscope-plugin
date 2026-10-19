@@ -273,7 +273,7 @@ export class NexscopeOAuth {
   async hasAccessToken(): Promise<boolean> {
     const grant = await this.loadGrant()
     const token = grant.tokens
-    if (token === undefined || token.access_token === '') return false
+    if (!isTokenRecord(token) || token.access_token === '') return false
     const expiresAt = tokenExpiry(grant)
     return expiresAt === undefined || expiresAt - EXPIRY_SKEW_MS > Date.now()
   }
@@ -286,14 +286,14 @@ export class NexscopeOAuth {
   async hasGrant(): Promise<boolean> {
     const grant = await this.loadGrant()
     const token = grant.tokens
-    if (token === undefined) return false
+    if (!isTokenRecord(token)) return false
     return token.access_token !== '' || token.refresh_token !== undefined
   }
 
   /** Read the stored access token, if any. */
   async accessToken(): Promise<string | undefined> {
     const grant = await this.loadGrant()
-    return grant.tokens?.access_token
+    return isTokenRecord(grant.tokens) ? grant.tokens.access_token : undefined
   }
 
   /** Forget every stored OAuth artifact. */
@@ -458,6 +458,11 @@ export class NexscopeOAuth {
     this.loaded = true
     await this.credentials.modifyRecord(this.key, async () => ({ kind: 'grant', payload: next }))
   }
+}
+
+/** Narrow a stored token record; a corrupted credential must not throw. */
+function isTokenRecord(value: unknown): value is StoredOAuthTokens {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 /** Narrow an opaque credential payload to a stored grant. */
