@@ -34,6 +34,7 @@ function fakeExec() {
 const oauth = {
   provider: { token: async () => 'test-token' },
   hasAccessToken: async () => true,
+  hasGrant: async () => true,
   signIn: async () => ({ status: 'signed-in', redirectUri: 'http://127.0.0.1:45871/callback' }),
 }
 

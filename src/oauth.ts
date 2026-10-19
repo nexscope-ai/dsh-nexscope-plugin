@@ -278,6 +278,18 @@ export class NexscopeOAuth {
     return expiresAt === undefined || expiresAt - EXPIRY_SKEW_MS > Date.now()
   }
 
+  /**
+   * Whether any usable grant exists. An expired access token still counts when
+   * a refresh token is present, because the MCP client refreshes it on the
+   * next 401 instead of asking the user to sign in again.
+   */
+  async hasGrant(): Promise<boolean> {
+    const grant = await this.loadGrant()
+    const token = grant.tokens
+    if (token === undefined) return false
+    return token.access_token !== '' || token.refresh_token !== undefined
+  }
+
   /** Read the stored access token, if any. */
   async accessToken(): Promise<string | undefined> {
     const grant = await this.loadGrant()

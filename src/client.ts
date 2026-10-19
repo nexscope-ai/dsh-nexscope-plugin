@@ -11,6 +11,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import {
   Client,
   OAuthError,
+  SdkHttpError,
   StreamableHTTPClientTransport,
   UnauthorizedError,
   type CallToolResult,
@@ -38,6 +39,16 @@ function isAuthFailure(error: unknown): boolean {
     message.includes('invalid_client') ||
     message.includes('invalid_target') ||
     message.includes('401')
+  )
+}
+
+/** Whether an error means the current session can no longer be used. */
+function isTransportFailure(error: unknown): boolean {
+  return (
+    error instanceof UnauthorizedError ||
+    error instanceof OAuthError ||
+    error instanceof SdkHttpError ||
+    error instanceof TypeError
   )
 }
 
@@ -100,7 +111,17 @@ export class NexscopeClient {
    */
   async call(name: string, args: Record<string, unknown>, signal: AbortSignal): Promise<CallToolResult> {
     const session = await this.connect()
-    return session.client.callTool({ name, arguments: args }, { signal, timeout: this.config.toolCallTimeoutMs })
+    try {
+      return await session.client.callTool(
+        { name, arguments: args },
+        { signal, timeout: this.config.toolCallTimeoutMs },
+      )
+    } catch (error) {
+      // A transport failure leaves the session unusable; drop it so the next
+      // call reconnects. The failed call itself is never retried.
+      if (isTransportFailure(error)) await this.reset()
+      throw error
+    }
   }
 
   /** Drop the session so the next call reconnects. */
@@ -125,7 +146,7 @@ export class NexscopeClient {
 
   /** Open one authenticated session. */
   private async open(): Promise<McpSession> {
-    if (!(await this.oauth.hasAccessToken())) {
+    if (!(await this.oauth.hasGrant())) {
       throw new SignInRequiredError()
     }
     const transport = this.transportFactory(new URL(this.config.mcpUrl))

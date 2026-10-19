@@ -67,6 +67,12 @@ export declare class NexscopeOAuth {
     private buildProvider;
     /** Whether a usable access token is currently stored. */
     hasAccessToken(): Promise<boolean>;
+    /**
+     * Whether any usable grant exists. An expired access token still counts when
+     * a refresh token is present, because the MCP client refreshes it on the
+     * next 401 instead of asking the user to sign in again.
+     */
+    hasGrant(): Promise<boolean>;
     /** Read the stored access token, if any. */
     accessToken(): Promise<string | undefined>;
     /** Forget every stored OAuth artifact. */

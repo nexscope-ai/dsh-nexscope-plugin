@@ -96,6 +96,7 @@ function clientStub(catalog: readonly Tool[]) {
 function oauthStub() {
   return {
     hasAccessToken: async () => true,
+    hasGrant: async () => true,
     signIn: async () => ({ status: 'signed-in', redirectUri: 'http://127.0.0.1:45871/callback' }),
   }
 }
@@ -286,6 +287,27 @@ describe('NexscopeOAuth', () => {
     const reloaded = new NexscopeOAuth(fakeContext(credentials) as never, resolveConfig())
     expect(await reloaded.accessToken()).toBeUndefined()
     expect((await reloaded.loadGrant()).state).toBe('abc')
+  })
+
+  it('keeps an expired access token usable when a refresh token exists', async () => {
+    const credentials = memoryCredentials()
+    const oauth = new NexscopeOAuth(fakeContext(credentials) as never, resolveConfig())
+    await oauth.patchGrant({
+      tokens: {
+        access_token: 'old',
+        token_type: 'Bearer',
+        expires_in: 60,
+        refresh_token: 'refresh',
+      },
+      savedAt: Date.now() - 60 * 60 * 1000,
+    })
+    expect(await oauth.hasAccessToken()).toBe(false)
+    expect(await oauth.hasGrant()).toBe(true)
+  })
+
+  it('reports no grant when the store is empty', async () => {
+    const oauth = new NexscopeOAuth(fakeContext() as never, resolveConfig())
+    expect(await oauth.hasGrant()).toBe(false)
   })
 
   it('treats an expired access token as needing sign-in', async () => {
