@@ -62,6 +62,17 @@ async function harness() {
     }),
   )
   server.registerTool(
+    'nexscope_account',
+    {
+      description: 'Account summary.',
+      inputSchema: z.object({}),
+    },
+    async () => ({
+      content: [{ type: 'text', text: 'Net credit: 7' }],
+      structuredContent: { netCredit: 7 },
+    }),
+  )
+  server.registerTool(
     'nexscope_fail',
     {
       description: 'Always fails.',
@@ -133,6 +144,19 @@ describe('MCP integration', () => {
     expect(result.name).toBe('nexscope_echo')
     expect(result.consumesCredits).toBe(true)
     expect(result.inputSchema).toBeDefined()
+  })
+
+  it('prefers a server-published account tool over the API key', async () => {
+    const { registered } = await harness()
+    const account = registered.find((definition) => definition.name === 'nexscope_account')!
+    const result = (await account.execute({}, fakeExec())) as {
+      available: boolean
+      source: string
+      text: string
+    }
+    expect(result.available).toBe(true)
+    expect(result.source).toBe('mcp')
+    expect(result.text).toContain('Net credit: 7')
   })
 
   it('searches the live catalog', async () => {

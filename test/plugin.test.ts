@@ -427,6 +427,16 @@ describe('export helpers', () => {
     expect(serializeExport({ a: 1 }, 'json').rows).toBe(1)
   })
 
+  it('requires exactly one JSON source', async () => {
+    await expect(
+      exportDeliverable(
+        fakeContext() as never,
+        { output: 'out.csv', format: 'csv', cwd: '/tmp' },
+        new AbortController().signal,
+      ),
+    ).rejects.toThrow(/exactly one/)
+  })
+
   it('rejects an output path that escapes the workspace', () => {
     expect(() => assertInsideWorkspace('../escape.csv', '/tmp/work')).toThrow(/escapes/)
     expect(assertInsideWorkspace('out.csv', '/tmp/work')).toBe('/tmp/work/out.csv')

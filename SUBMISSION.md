@@ -5,7 +5,7 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 ## Verified
 
 - [x] `npm run typecheck` passes.
-- [x] `npm test` passes: 37 tests across three files.
+- [x] `npm test` passes: 39 tests across three files.
 - [x] GitHub Actions `CI` passes on a clean Linux runner (`npm ci`, typecheck, tests, `npm pack --dry-run`).
 - [x] `npm run build` emits `lib/`; `npm pack --dry-run` produces 18 files, 66.7 kB.
 - [x] A real MCP client/server integration test over a linked in-memory transport covers tool discovery, exact schema pass-through, multi-block text plus structured content, and upstream error results.
