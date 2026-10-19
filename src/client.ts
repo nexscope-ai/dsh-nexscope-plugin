@@ -15,6 +15,7 @@ import {
   UnauthorizedError,
   type CallToolResult,
   type Tool,
+  type Transport,
 } from '@modelcontextprotocol/client'
 import type { ResolvedConfig } from './config.js'
 import { NexscopeOAuth, SignInRequiredError, describe } from './oauth.js'
@@ -22,7 +23,7 @@ import { NexscopeOAuth, SignInRequiredError, describe } from './oauth.js'
 /** One opened MCP session. */
 export interface McpSession {
   readonly client: Client
-  readonly transport: StreamableHTTPClientTransport
+  readonly transport: Transport
   readonly tools: readonly Tool[]
 }
 
@@ -47,10 +48,23 @@ export class NexscopeClient {
   private readonly log: { info(message: string): void; warn(message: string): void }
   private session?: Promise<McpSession>
   private closed = false
+  private readonly transportFactory: (url: URL) => Transport
 
-  constructor(ctx: Context, config: ResolvedConfig, oauth: NexscopeOAuth) {
+  constructor(
+    ctx: Context,
+    config: ResolvedConfig,
+    oauth: NexscopeOAuth,
+    transportFactory?: (url: URL) => Transport,
+  ) {
     this.config = config
     this.oauth = oauth
+    this.transportFactory =
+      transportFactory ??
+      ((url) =>
+        new StreamableHTTPClientTransport(url, {
+          authProvider: this.oauth.provider,
+          requestInit: { headers: { accept: 'application/json, text/event-stream' } },
+        }))
     this.log = {
       info: (message) => ctx.logger.info(message),
       warn: (message) => ctx.logger.warn(message),
@@ -114,10 +128,7 @@ export class NexscopeClient {
     if (!(await this.oauth.hasAccessToken())) {
       throw new SignInRequiredError()
     }
-    const transport = new StreamableHTTPClientTransport(new URL(this.config.mcpUrl), {
-      authProvider: this.oauth.provider,
-      requestInit: { headers: { accept: 'application/json, text/event-stream' } },
-    })
+    const transport = this.transportFactory(new URL(this.config.mcpUrl))
     const client = new Client({ name: 'dsh-nexscope', version: '0.1.0' })
     try {
       await client.connect(transport)

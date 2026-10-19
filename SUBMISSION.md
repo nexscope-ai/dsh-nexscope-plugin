@@ -5,8 +5,9 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 ## Verified
 
 - [x] `npm run typecheck` passes.
-- [x] `npm test` passes: 26 tests across two files.
-- [x] `npm run build` emits `lib/`; `npm pack --dry-run` produces 18 files, 66.4 kB.
+- [x] `npm test` passes: 30 tests across three files.
+- [x] `npm run build` emits `lib/`; `npm pack --dry-run` produces 18 files, 66.7 kB.
+- [x] A real MCP client/server integration test over a linked in-memory transport covers tool discovery, exact schema pass-through, multi-block text plus structured content, and upstream error results.
 - [x] The plugin installs into a fresh DSH profile with `dsh plugin --profile web add .`.
 - [x] `dsh --profile web --dump-config` shows the `nexscope` row.
 - [x] `dsh --profile web --dump-config-schema` resolves the entry as `status: schema` and adds **no** new diagnostics compared with a plugin-free baseline.

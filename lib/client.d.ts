@@ -8,13 +8,13 @@
  * @module dsh-nexscope/client
  */
 import type { Context } from '@deepseek-ai/cordis';
-import { Client, StreamableHTTPClientTransport, type CallToolResult, type Tool } from '@modelcontextprotocol/client';
+import { Client, type CallToolResult, type Tool, type Transport } from '@modelcontextprotocol/client';
 import type { ResolvedConfig } from './config.js';
 import { NexscopeOAuth } from './oauth.js';
 /** One opened MCP session. */
 export interface McpSession {
     readonly client: Client;
-    readonly transport: StreamableHTTPClientTransport;
+    readonly transport: Transport;
     readonly tools: readonly Tool[];
 }
 /** Lazily connected Nexscope MCP client. */
@@ -24,7 +24,8 @@ export declare class NexscopeClient {
     private readonly log;
     private session?;
     private closed;
-    constructor(ctx: Context, config: ResolvedConfig, oauth: NexscopeOAuth);
+    private readonly transportFactory;
+    constructor(ctx: Context, config: ResolvedConfig, oauth: NexscopeOAuth, transportFactory?: (url: URL) => Transport);
     /** The configured MCP endpoint. */
     get endpoint(): string;
     /** Connect on first use and reuse the session afterwards. */

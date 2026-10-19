@@ -100,7 +100,7 @@ npm test
 npm run build
 ```
 
-`npm test` runs unit tests for catalog search, result rendering, export conversion, account handling, and the OAuth callback paths, plus one integration test that mounts the plugin on real Cordis services and asserts that the bundled skill and all seven tools are registered.
+`npm test` runs unit tests for catalog search, result rendering, export conversion, account handling, and the OAuth callback paths; an MCP integration test over a linked in-memory transport; and a composition test that mounts the plugin on real Cordis services and asserts that the bundled skill and all seven tools are registered.
 
 ## Security notes
 
