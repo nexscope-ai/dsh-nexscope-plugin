@@ -45,6 +45,8 @@ export declare class NexscopeOAuth {
         warn(message: string): void;
     };
     pending?: PendingSignIn;
+    /** Opens the authorization URL; tests replace the system browser. */
+    openAuthorization: (url: string) => void | Promise<void>;
     grant?: OAuthGrant;
     loaded: boolean;
     constructor(ctx: Context, config: ResolvedConfig);
@@ -62,7 +64,9 @@ export declare class NexscopeOAuth {
      * Run a browser sign-in and wait for the loopback callback.
      * @returns the completed sign-in.
      */
-    signIn(): Promise<SignInResult>;
+    signIn(options?: {
+        openBrowser?: (url: string) => void | Promise<void>;
+    }): Promise<SignInResult>;
     /** Start the loopback listener on the first free configured port. */
     startCallbackListener(): Promise<PendingSignIn>;
     /** Bind one loopback port and wire the callback handler. */

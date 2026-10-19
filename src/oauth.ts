@@ -116,6 +116,8 @@ export class NexscopeOAuth {
   private readonly key: CredentialKey
   readonly log: { info(message: string): void; warn(message: string): void }
   pending?: PendingSignIn
+  /** Opens the authorization URL; tests replace the system browser. */
+  openAuthorization: (url: string) => void | Promise<void> = openBrowser
   grant?: OAuthGrant
   loaded = false
 
@@ -166,7 +168,7 @@ export class NexscopeOAuth {
       },
       redirectToAuthorization: async (authorizationUrl: URL) => {
         if (self.pending === undefined) throw new SignInRequiredError()
-        await openBrowser(authorizationUrl.toString())
+        await self.openAuthorization(authorizationUrl.toString())
       },
       saveCodeVerifier: async (verifier: string) => {
         await self.patchGrant({ verifier })
@@ -232,7 +234,10 @@ export class NexscopeOAuth {
    * Run a browser sign-in and wait for the loopback callback.
    * @returns the completed sign-in.
    */
-  async signIn(): Promise<SignInResult> {
+  async signIn(
+    options: { openBrowser?: (url: string) => void | Promise<void> } = {},
+  ): Promise<SignInResult> {
+    this.openAuthorization = options.openBrowser ?? openBrowser
     if (await this.hasAccessToken()) {
       return { status: 'already-signed-in', redirectUri: this.currentRedirectUri() }
     }
