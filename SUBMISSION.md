@@ -29,9 +29,8 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 
 ## Pending
 
-- [ ] **Merge the web change and deploy.** The document and market assets are merged into the web repository's `test` branch (`hotfix/20261019-dsh-plugin-metadata`, merge commit `c41f59d7`). `master` is protected, so the merge branch `merge/dsh-metadata-master` is pushed and an MR is required:
-  `https://git.ziniao.com/nexscope/cient/web/-/merge_requests/new?merge_request%5Bsource_branch%5D=merge%2Fdsh-metadata-master`
-  After the production deploy, confirm `https://www.nexscope.ai/.well-known/dsh-nexscope-client.json` returns `200 application/json` with no redirect. This verification used the temporary document at `https://cdn.jsdelivr.net/gh/TANAGELEEE/dsh-oauth-client-test@main/client.json`, so production sign-in with the shipped client id still needs this deploy.
+- [ ] **Confirm the production deploy.** The CIMD document is merged to `master` (MR !372, merge commit `eeccf2fc`) and the master pipeline deploys it. Confirm `https://www.nexscope.ai/.well-known/dsh-nexscope-client.json` returns `200 application/json` with no redirect, then re-run one sign-in with the production client id.
+- [ ] **Merge the market index after the npm release.** MR `!372` intentionally contains only the CIMD document; the index would advertise `dsh-nexscope@0.1.0` before it exists. The ready merge branch is `merge/dsh-metadata-master`; merge it once `npm publish` succeeds.
 - [ ] Delete the two temporary public CIMD repositories once the production document is live.
 - [ ] Run one asynchronous generation and verify task polling end to end. `nexscope_media_task_result` is reachable and its exact schema is `{skillSlug, taskId}`; with a fake task id it returns code `99404` without charging. The catalog marks 63 skills as `asyncTask`, all image/video generation.
 - [ ] Confirm a large result stays within the harness spill budget.
