@@ -18,7 +18,7 @@ Status: **implementation complete; live OAuth, refresh, paid call, and export ve
 - [x] The token endpoint accepts the CIMD client identity for `authorization_code` and returns `invalid_grant` for a fake code, proving client authentication and PKCE parameters are accepted.
 - [x] The token endpoint requires the RFC 8707 `resource` parameter on refresh (`invalid_target` when absent, `invalid_grant` when present); the MCP SDK sends `resource` on both the code exchange and the refresh path.
 - [x] The OAuth callback listener accepts a valid code, rejects a state mismatch, rejects a denial, and times out.
-- [x] Sign-in preflights the client-metadata document (reachability, JSON content type, matching `client_id`, and the exact loopback callback). The temporary document passes; the production URL currently fails fast with `HTTP 404` instead of opening a broken browser page.
+- [x] Sign-in preflights the client-metadata document (reachability, JSON content type, matching `client_id`, and the exact loopback callback). The temporary document passes; with the production document absent, sign-in fails in about 2 seconds with `HTTP 404` and the URL to fix, instead of opening a browser and timing out.
 - [x] The market index validates with `parseMarketIndex` from `@deepseek-ai/dsh-plugin-market-index`.
 - [x] **Live OAuth sign-in against production.** The browser flow completed with the CIMD client, the loopback callback received the code, and the token exchange stored a grant with a refresh token (`expires_in: 899`, `scope: mcp:tools`).
 - [x] **Live catalog read.** The plugin connected to `https://api.nexscope.ai/api/skill-api/v2/mcp` and listed **545** published tools.
