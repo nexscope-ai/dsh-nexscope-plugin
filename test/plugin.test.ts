@@ -6,6 +6,7 @@
  * persistence. They use a fake context and never reach the network.
  */
 import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import { createServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -306,6 +307,47 @@ describe('NexscopeOAuth', () => {
     const reloaded = new NexscopeOAuth(fakeContext(credentials) as never, resolveConfig())
     expect(await reloaded.accessToken()).toBeUndefined()
     expect((await reloaded.loadGrant()).state).toBe('abc')
+  })
+
+  it('stores discovery state that carries an undefined resourceMetadataUrl', async () => {
+    // The MCP SDK saves discovery state with an explicit `resourceMetadataUrl:
+    // undefined` when no protected-resource metadata is found. A credential
+    // store that only admits JSON must still accept the grant.
+    const credentials = memoryCredentials()
+    const oauth = new NexscopeOAuth(fakeContext(credentials) as never, resolveConfig())
+    await oauth.patchGrant({
+      discovery: {
+        authorizationServerUrl: 'https://api.nexscope.ai',
+        resourceMetadataUrl: undefined,
+      } as never,
+    })
+    const stored = (await oauth.loadGrant()).discovery as Record<string, unknown>
+    expect(stored.authorizationServerUrl).toBe('https://api.nexscope.ai')
+    expect('resourceMetadataUrl' in stored).toBe(false)
+  })
+
+  it('releases the callback port when the grant write fails', async () => {
+    const credentials = memoryCredentials()
+    const failing = {
+      ...credentials,
+      modifyRecord: async () => {
+        throw new TypeError('credential write rejected')
+      },
+    }
+    const ports = [45881, 45882, 45883]
+    const oauth = new NexscopeOAuth(
+      fakeContext(failing as never) as never,
+      resolveConfig({ callbackPorts: ports }),
+    )
+    await expect(oauth.startCallbackListener()).rejects.toThrow(/No loopback port/)
+    // Every port must be bindable again; a leaked listener keeps it busy.
+    for (const port of ports) {
+      await new Promise<void>((resolve, reject) => {
+        const server = createServer()
+        server.once('error', reject)
+        server.listen(port, '127.0.0.1', () => server.close(() => resolve()))
+      })
+    }
   })
 
   it('keeps an expired access token usable when a refresh token exists', async () => {

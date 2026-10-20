@@ -1,6 +1,26 @@
 # Changelog
 
-## 0.1.0 — unreleased
+## 0.1.1
+
+Fix sign-in failing on a fresh install.
+
+- **Sign-in no longer fails with "holds a value JSON cannot represent".** The
+  MCP SDK saves discovery state with an explicit `resourceMetadataUrl:
+  undefined` when the authorization server publishes no protected-resource
+  metadata. The credential store only admits payloads that survive a JSON round
+  trip, so that save was rejected and every sign-in attempt failed.
+- **A rejected grant write no longer poisons the session.** `patchGrant` now
+  persists before updating the in-memory grant, so a failed write leaves no
+  state the store never accepted.
+- **A failed grant write no longer leaks the loopback port.** The listener is
+  closed when the write after binding fails, instead of staying open and making
+  every later attempt fail with `EADDRINUSE`.
+- Regression tests: storing discovery state that carries `undefined`, and
+  releasing the callback port when the grant write fails.
+
+## 0.1.0
+
+First release.
 
 First release.
 

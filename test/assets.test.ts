@@ -40,13 +40,14 @@ describe('market index', () => {
     expect(plugin.name).toBe('@nexscope/dsh-nexscope')
     expect(plugin.icon).toBe('https://www.nexscope.ai/dsh/icons/nexscope.png')
     const version = plugin.versions[0]!
-    expect(version.version).toBe('0.1.0')
     expect(version.source.type).toBe('npm')
 
     const pkg = JSON.parse(
       await readFile(new URL('../package.json', import.meta.url), 'utf8'),
     ) as { engines?: { dsh?: string }; version?: string }
-    expect(pkg.version).toBe('0.1.0')
+    // The index must advertise the version the package actually ships, so a
+    // release cannot publish one number and list another.
+    expect(version.version).toBe(pkg.version)
     expect(version.engines?.dsh).toBe(pkg.engines?.dsh)
   })
 

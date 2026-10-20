@@ -422,7 +422,14 @@ export class NexscopeOAuth {
       })
     })
     const redirectUri = `http://127.0.0.1:${port}${CALLBACK_PATH}`
-    await this.patchGrant({ redirectUri, state })
+    try {
+      await this.patchGrant({ redirectUri, state })
+    } catch (error) {
+      // The listener is already bound; leaving it open would leak the port and
+      // make every later attempt fail with EADDRINUSE.
+      server.close()
+      throw error
+    }
     const timeout = setTimeout(() => {
       settle(new SignInFailedError('The Nexscope sign-in did not complete in time.'))
     }, this.config.signInTimeoutMs)
@@ -455,11 +462,27 @@ export class NexscopeOAuth {
 
   /** Merge one patch into the durable grant. */
   async patchGrant(patch: Partial<OAuthGrant>): Promise<void> {
-    const next = { ...(await this.loadGrant()), ...patch }
+    const next = jsonSafe({ ...(await this.loadGrant()), ...patch })
+    // Persist before committing to memory: a rejected write must not leave the
+    // cached grant describing a state the store never accepted.
+    await this.credentials.modifyRecord(this.key, async () => ({ kind: 'grant', payload: next }))
     this.grant = next
     this.loaded = true
-    await this.credentials.modifyRecord(this.key, async () => ({ kind: 'grant', payload: next }))
   }
+}
+
+/**
+ * Drop `undefined` members so a grant survives the credential store's JSON
+ * round-trip gate.
+ *
+ * The MCP SDK saves discovery state with an explicit `resourceMetadataUrl:
+ * undefined` when no protected-resource metadata was found, and the credential
+ * store rejects any payload containing a value JSON cannot represent. Cleaning
+ * the payload here keeps that SDK shape storable; dropping a key that held
+ * `undefined` loses nothing, because an absent key reads back the same way.
+ */
+function jsonSafe<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T
 }
 
 /** Whether a value is a usable non-empty string. */
