@@ -15,7 +15,7 @@ This is a [DSH plugin bundle](https://deepseek-harness.github.io/deepseek-harnes
 ## Install
 
 ```sh
-dsh plugin --profile web add dsh-nexscope
+dsh plugin --profile web add @nexscope/dsh-nexscope
 ```
 
 Then restart the profile. The plugin appears on the **Plugins** page and its `nexscope` skill appears in the session skill catalog.

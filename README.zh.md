@@ -13,7 +13,7 @@
 ## 安装
 
 ```sh
-dsh plugin --profile web add dsh-nexscope
+dsh plugin --profile web add @nexscope/dsh-nexscope
 ```
 
 然后重启 profile。插件会出现在 Plugins 页，`nexscope` skill 会出现在会话的技能目录中。

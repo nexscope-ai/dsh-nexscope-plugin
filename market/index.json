@@ -28,7 +28,7 @@
   },
   "plugins": [
     {
-      "name": "dsh-nexscope",
+      "name": "@nexscope/dsh-nexscope",
       "title": {
         "en": "Nexscope",
         "zh": "Nexscope"

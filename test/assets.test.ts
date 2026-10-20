@@ -37,7 +37,7 @@ describe('market index', () => {
     const parsed = parseMarketIndex(raw, INDEX_URL)
     expect(parsed.plugins).toHaveLength(1)
     const plugin = parsed.plugins[0]!
-    expect(plugin.name).toBe('dsh-nexscope')
+    expect(plugin.name).toBe('@nexscope/dsh-nexscope')
     expect(plugin.icon).toBe('https://www.nexscope.ai/dsh/icons/nexscope.png')
     const version = plugin.versions[0]!
     expect(version.version).toBe('0.1.0')
