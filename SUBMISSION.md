@@ -22,6 +22,7 @@ Status: **production assets deployed; live OAuth with the shipped client id veri
 - [x] **Production deploy verified.** `https://www.nexscope.ai/.well-known/dsh-nexscope-client.json`, `/dsh/index.json`, and `/dsh/icons/nexscope.png` each return `200` with `application/json; charset=UTF-8`, `application/json; charset=UTF-8`, and `image/png`. All three are byte-identical to the repository copies, and the live index parses with `parseMarketIndex`.
 - [x] **Production client-id sign-in.** With the shipped `client_id`, the authorize page showed `metadata: www.nexscope.ai`, consent completed, the grant stored `client_id: https://www.nexscope.ai/.well-known/dsh-nexscope-client.json` plus a refresh token, and the client listed **545** tools.
 - [x] Sign-in preflights the client-metadata document (reachability, JSON content type, matching `client_id`, and the exact loopback callback). The temporary document passes; with the production document absent, sign-in fails in about 2 seconds with `HTTP 404` and the URL to fix, instead of opening a browser and timing out.
+- [x] **npm release.** `@nexscope/dsh-nexscope@0.1.0` is published publicly, `npm install` succeeds, and `dsh plugin --profile web add @nexscope/dsh-nexscope@0.1.0` installs into a fresh profile with `status: schema` and baseline diagnostics.
 - [x] The market index validates with `parseMarketIndex` from `@deepseek-ai/dsh-plugin-market-index`, and an asset test keeps the index version, `engines.dsh`, icon URL, icon size, and the client metadata document in sync with the package.
 - [x] `npm audit --omit=dev` reports no vulnerabilities.
 - [x] **Live OAuth sign-in against production.** The browser flow completed with the CIMD client, the loopback callback received the code, and the token exchange stored a grant with a refresh token (`expires_in: 899`, `scope: mcp:tools`).
@@ -33,7 +34,8 @@ Status: **production assets deployed; live OAuth with the shipped client id veri
 
 ## Pending
 
-- [ ] **Publish the npm package.** The site is deployed and now advertises `dsh-nexscope@0.1.0` at `/dsh/index.json`, but `https://registry.npmjs.org/dsh-nexscope` still returns `404`. Run `npm login && npm publish` in this directory, then verify `npm view dsh-nexscope version` returns `0.1.0` and install it once from the registry.
+- [ ] **Re-run the manual production deploy.** `master` now lists `@nexscope/dsh-nexscope` in `/dsh/index.json` (MR !377), but the live file still says `dsh-nexscope` until the manual job runs again.
+- [ ] Remove the stray `0.0.0-stage` version from npm (created by the blocked first publish). It is not tagged `latest`, so it does not affect installs.
 - [ ] Delete the two temporary public CIMD repositories once the production document is live.
 - [ ] Run one asynchronous generation and verify task polling end to end. `nexscope_media_task_result` is reachable and its exact schema is `{skillSlug, taskId}`; with a fake task id it returns code `99404` without charging. The catalog marks 63 skills as `asyncTask`, all image/video generation.
 - [ ] Confirm a large result stays within the harness spill budget.
