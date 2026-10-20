@@ -1,6 +1,6 @@
 # Release prerequisites
 
-Status: **production assets deployed; live OAuth with the shipped client id verified.**
+Status: **released.** Published on npm, deployed on nexscope.ai, verified end to end.
 
 ## Verified
 
@@ -22,6 +22,7 @@ Status: **production assets deployed; live OAuth with the shipped client id veri
 - [x] **Production deploy verified.** `https://www.nexscope.ai/.well-known/dsh-nexscope-client.json`, `/dsh/index.json`, and `/dsh/icons/nexscope.png` each return `200` with `application/json; charset=UTF-8`, `application/json; charset=UTF-8`, and `image/png`. All three are byte-identical to the repository copies, and the live index parses with `parseMarketIndex`.
 - [x] **Production client-id sign-in.** With the shipped `client_id`, the authorize page showed `metadata: www.nexscope.ai`, consent completed, the grant stored `client_id: https://www.nexscope.ai/.well-known/dsh-nexscope-client.json` plus a refresh token, and the client listed **545** tools.
 - [x] Sign-in preflights the client-metadata document (reachability, JSON content type, matching `client_id`, and the exact loopback callback). The temporary document passes; with the production document absent, sign-in fails in about 2 seconds with `HTTP 404` and the URL to fix, instead of opening a browser and timing out.
+- [x] **Deployed index serves the scoped name.** `https://www.nexscope.ai/dsh/index.json` returns `@nexscope/dsh-nexscope` 0.1.0 and parses with `parseMarketIndex`.
 - [x] **npm release.** `@nexscope/dsh-nexscope@0.1.0` is published publicly, `npm install` succeeds, and `dsh plugin --profile web add @nexscope/dsh-nexscope@0.1.0` installs into a fresh profile with `status: schema` and baseline diagnostics.
 - [x] The market index validates with `parseMarketIndex` from `@deepseek-ai/dsh-plugin-market-index`, and an asset test keeps the index version, `engines.dsh`, icon URL, icon size, and the client metadata document in sync with the package.
 - [x] `npm audit --omit=dev` reports no vulnerabilities.
@@ -34,8 +35,7 @@ Status: **production assets deployed; live OAuth with the shipped client id veri
 
 ## Pending
 
-- [ ] **Re-run the manual production deploy.** `master` now lists `@nexscope/dsh-nexscope` in `/dsh/index.json` (MR !377), but the live file still says `dsh-nexscope` until the manual job runs again.
-- [ ] Remove the stray `0.0.0-stage` version from npm (created by the blocked first publish). It is not tagged `latest`, so it does not affect installs.
+- [ ] Remove the stray `0.0.0-stage` version from npm through the website. It is not tagged `latest`, so it does not affect installs; bypass-2FA tokens may not unpublish.
 - [ ] Delete the two temporary public CIMD repositories once the production document is live.
 - [ ] Run one asynchronous generation and verify task polling end to end. `nexscope_media_task_result` is reachable and its exact schema is `{skillSlug, taskId}`; with a fake task id it returns code `99404` without charging. The catalog marks 63 skills as `asyncTask`, all image/video generation.
 - [ ] Confirm a large result stays within the harness spill budget.
