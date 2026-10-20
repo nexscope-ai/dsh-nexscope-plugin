@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.2
+
+Show the Nexscope icon on the plugin's page and cards.
+
+- `package.json` now declares `icon: ./assets/icon.png`. DeepSeek Harness reads
+  the icon from the manifest and inlines it as a data URL, so without this field
+  the plugin page fell back to the generic placeholder artwork. The asset was
+  already shipped; only the manifest declaration was missing.
+
 ## 0.1.1
 
 Fix sign-in failing on a fresh install.
